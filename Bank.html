@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>The Richard Bank</title>
+</head>
+<body>
+  <h3>The Richard Bank</h3>
+
+  <table>
+    <tr>
+      <td>Balance</td>
+      <td><input type="text" id="balance" name="balance" value="0"></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td><input type="text" id="depositAmount" name="depositAmount"></td>
+      <td><button type="button" id="depositButton" name="depositButton" value="Deposit" style="width: 120px;">Deposit</button></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td><input type="text" id="withdrawalAmount" name="withdrawalAmount"></td>
+      <td><button type="button" id="withdrawalButton" name="withdrawalButton" value="Withdrawal" style="width: 120px;">Withdrawal</button></td>
+    </tr>
+  </table>
+
+  <pre id="today_transactions"></pre>
+
+  <script>
+    // Retrieve transaction history from localStorage if available
+    var transactionHistory = JSON.parse(localStorage.getItem('transactionHistory')) || [];
+
+    // Function to update the transaction history on the page
+    function updateTransactionHistory() {
+      var todayTransactionsElement = document.getElementById('today_transactions');
+      todayTransactionsElement.textContent = ''; // Clear the existing content
+
+      transactionHistory.forEach(function(transaction) {
+        todayTransactionsElement.textContent += transaction + '\n';
+      });
+    }
+
+    // Function to get the current date and time
+    function getCurrentDateTime() {
+      var now = new Date();
+      var date = now.toLocaleDateString();
+      var time = now.toLocaleTimeString();
+      return date + ' ' + time;
+    }
+
+    // Function to handle deposits
+    function handleDeposit() {
+      var amount = parseFloat(document.getElementById('depositAmount').value);
+      var balance = parseFloat(document.getElementById('balance').value);
+      balance += amount;
+      document.getElementById('balance').value = balance;
+
+      var transaction = 'Deposit: ' + amount + ' (Date/Time: ' + getCurrentDateTime() + ')';
+      transactionHistory.push(transaction);
+      localStorage.setItem('transactionHistory', JSON.stringify(transactionHistory));
+
+      updateTransactionHistory();
+      console.log(transaction);
+    }
+
+    // Function to handle withdrawals
+    function handleWithdrawal() {
+      var amount = parseFloat(document.getElementById('withdrawalAmount').value);
+      var balance = parseFloat(document.getElementById('balance').value);
+
+      if (amount <= balance) {
+        balance -= amount;
+        document.getElementById('balance').value = balance;
+
+        var transaction = 'Withdrawal: ' + amount + ' (Date/Time: ' + getCurrentDateTime() + ')';
+        transactionHistory.push(transaction);
+        localStorage.setItem('transactionHistory', JSON.stringify(transactionHistory));
+
+        updateTransactionHistory();
+        console.log(transaction);
+      } else {
+        alert('Insufficient balance.');
+      }
+    }
+
+    // Event listeners for deposit and withdrawal buttons
+    document.getElementById('depositButton').addEventListener('click', handleDeposit);
+    document.getElementById('withdrawalButton').addEventListener('click', handleWithdrawal);
+
+    // Initialize transaction history on page load
+    updateTransactionHistory();
+  </script>
+</body>
+</html>
